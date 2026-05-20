@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths: [ 'frontend/**' ]
 
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
