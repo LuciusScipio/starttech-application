@@ -1,0 +1,29 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'frontend/**' ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build React App
+        working-directory: ./frontend
+        env:
+          VITE_API_URL: ${{ secrets.ALB_DNS_NAME }} # You'll get this from Terraform outputs
+        run: npm run build
+
+      - name: Deploy to S3
+        run: aws s3 sync ./frontend/dist s3://starttech-frontend-20260520201223674700000001 --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
